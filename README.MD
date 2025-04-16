@@ -1,180 +1,157 @@
 # SimpleAuth
 
-SimpleAuth — это простой сервер аутентификации, реализованный на Node.js с использованием Express, Sequelize и SQLite. Он предоставляет базовые функции регистрации, аутентификации, генерации JWT и управления токенами.
+SimpleAuth — это проект для управления аутентификацией пользователей. Он предоставляет API для регистрации, входа и управления учетными записями.
 
-## Функциональность
+## Используемые технологии
 
-- Регистрация пользователей
-- Аутентификация пользователей
-- Генерация и проверка JWT токенов
-- Регистрация и обновление секретных токенов
-- Ограничение запросов для защиты от атак
+- **Node.js** — серверная платформа.
+- **Express.js** — веб-фреймворк для создания API.
+- **Sequelize** — ORM для работы с базой данных.
+- **SQLite** — база данных для хранения информации о пользователях.
+- **JWT (JSON Web Tokens)** — для аутентификации и авторизации.
+- **argon2** — для хэширования паролей.
+- **Swagger** — для документирования API.
 
-## Установка
+## Установка и запуск
 
 1. Клонируйте репозиторий:
    ```bash
-   git clone <URL репозитория>
-   cd simpleAuth
+   git clone <repository-url>
    ```
-
 2. Установите зависимости:
    ```bash
    npm install
    ```
-
-3. Создайте файл `.env` на основе `envExm.txt`:
+3. Настройте переменные окружения в файле `.env`:
+   ```
+   serverPort=5000
+   devToken=exampleDevToken12345
+   secretJWT=exampleSecretJWT12345
+   ```
+4. Запустите сервер:
    ```bash
-   cp envExm.txt .env
-   ```
-
-4. Убедитесь, что в `.env` указаны корректные значения:
-   ```txt
-   serverPort=8080
-   devToken=<ваш_токен_разработчика>
-   secretJWT=<ваш_секретный_ключ_JWT>
-   ```
-
-## Запуск
-
-1. Запустите сервер в режиме разработки:
-   ```bash
-   npm run dev
-   ```
-
-2. Сервер будет доступен по адресу:
-   ```
-   http://localhost:8080
-   ```
-
-## Запуск в режиме Production
-
-1. Соберите Docker-образ:
-   ```bash
-   docker-compose build
-   ```
-
-2. Запустите контейнер в режиме `production`:
-   ```bash
-   docker-compose up
-   ```
-
-3. Сервер будет доступен по адресу:
-   ```
-   http://localhost:8080
-   ```
-
-4. Остановите контейнер:
-   ```bash
-   docker-compose down
+   npm start
    ```
 
 ## API Документация
 
-Документация API доступна по адресу:
-```
-http://localhost:8080/api-docs
-```
+Подробная документация доступна по [ссылке](https://floudy-dev.su/api/api-docs/#/User/post_api_user_register).
 
-### Основные маршруты
+### Основные API пути
 
-#### Пользовательские маршруты
+#### Регистрация пользователя
 
-- **POST /api/user/auth**
-  - Аутентификация пользователя.
-  - Параметры:
-    - `token` (query): Токен пользователя (обязательный).
-    - `Authorization` (header): Bearer токен (обязательный).
-  - Ответы:
-    - `200`: Успешная аутентификация.
-    - `400`: Отсутствуют параметры.
-    - `401`: Неверный формат заголовка авторизации.
-    - `403`: Неверный токен.
-    - `404`: Пользователь не найден.
+- **URL:** `/api/user/register`
+- **Метод:** `POST`
+- **Тело запроса:**
+  ```json
+  {
+    "name": "John Doe",
+    "mail": "user@example.com",
+    "password": "password123"
+  }
+  ```
+- **Ответы:**
+  - Успех:
+    ```json
+    {
+      "message": "Successful registration. Your token has generated.",
+      "token": "generated-secret-token"
+    }
+    ```
+  - Ошибка:
+    ```json
+    {
+      "error": "Registration error",
+      "message": "The user is already registered"
+    }
+    ```
 
-- **POST /api/user/register**
-  - Регистрация нового пользователя.
-  - Параметры:
-    - `name` (query): Имя пользователя (обязательный).
-    - `mail` (query): Email пользователя (обязательный).
-    - `password` (query): Пароль пользователя (обязательный).
-  - Ответы:
-    - `201`: Успешная регистрация.
-    - `400`: Отсутствуют параметры.
-    - `401`: Пользователь уже зарегистрирован.
+#### Аутентификация пользователя
 
-- **POST /api/user/generateJWT**
-  - Генерация нового JWT для пользователя.
-  - Параметры:
-    - `token` (query): Текущий токен пользователя (обязательный).
-    - `password` (query): Пароль пользователя (обязательный).
-    - `mail` (query): Email пользователя (обязательный).
-  - Ответы:
-    - `200`: Успешная генерация JWT.
-    - `400`: Отсутствуют параметры.
-    - `401`: Неверный пароль или пользователь не найден.
-    - `403`: Ошибка токена.
+- **URL:** `/api/user/auth`
+- **Метод:** `POST`
+- **Параметры запроса:**
+  - `token` (обязательный): токен пользователя.
+- **Заголовки:**
+  ```
+  Authorization: Bearer <jwt-token>
+  ```
+- **Ответы:**
+  - Успех:
+    ```json
+    {
+      "status": "success",
+      "user": {
+        "id": 1,
+        "name": "John Doe",
+        "email": "user@example.com",
+        "uid": 12345,
+        "balance": 100,
+        "access": "user",
+        "prefix": "Пользователь"
+      }
+    }
+    ```
+  - Ошибка:
+    ```json
+    {
+      "error": "Unauthorized",
+      "message": "Authorization header must follow 'Bearer <token>' format"
+    }
+    ```
 
-- **POST /api/user/regenToken**
-  - Перегенерация токена пользователя.
-  - Параметры:
-    - `password` (query): Пароль пользователя (обязательный).
-    - `mail` (query): Email пользователя (обязательный).
-  - Ответы:
-    - `200`: Успешная перегенерация токена.
-    - `400`: Отсутствуют параметры.
-    - `401`: Неверный пароль или пользователь не найден.
+#### Генерация нового JWT
 
-#### Разработческие маршруты
+- **URL:** `/api/user/generateJWT`
+- **Метод:** `POST`
+- **Параметры запроса:**
+  - `token` (обязательный): текущий токен пользователя.
+  - `password` (обязательный): пароль пользователя.
+  - `mail` (обязательный): email пользователя.
+- **Ответы:**
+  - Успех:
+    ```json
+    {
+      "message": "The JWT was successfully generated. The old token has been changed.",
+      "data": {
+        "jwtToken": "new-jwt-token",
+        "token": "new-secret-token"
+      }
+    }
+    ```
+  - Ошибка:
+    ```json
+    {
+      "error": "Unauthorized",
+      "message": "The password is incorrect or missing"
+    }
+    ```
 
-- **POST /dev/genAdminToken**
-  - Генерация временного токена администратора.
-  - Заголовки:
-    - `Authorization`: Токен разработчика (обязательный).
-  - Ответы:
-    - `201`: Успешная генерация токена.
-    - `400`: Отсутствуют параметры.
-    - `403`: Неверный токен разработчика.
+#### Перегенерация токена
 
-- **POST /dev/checkToken**
-  - Проверка токена.
-  - Заголовки:
-    - `Authorization`: Bearer токен (обязательный).
-  - Ответы:
-    - `200`: Успешная проверка токена.
-    - `400`: Неверный формат заголовка авторизации.
-    - `401`: Отсутствует заголовок авторизации.
-    - `403`: Неверный токен.
+- **URL:** `/api/user/regenToken`
+- **Метод:** `POST`
+- **Параметры запроса:**
+  - `password` (обязательный): пароль пользователя.
+  - `mail` (обязательный): email пользователя.
+- **Ответы:**
+  - Успех:
+    ```json
+    {
+      "status": "Success regen token",
+      "message": "Your token has been reissued. To log in later, you need to issue a new JWT using a new token. KEEP THE TOKEN IN A SAFE PLACE.",
+      "token": "new-secret-token"
+    }
+    ```
+  - Ошибка:
+    ```json
+    {
+      "error": "incorrect password",
+      "message": "The transmitted password is incorrect or has not been transmitted"
+    }
+    ```
 
-## Основные зависимости
+## Контакты
 
-- [Express](https://expressjs.com/) — веб-фреймворк для Node.js
-- [Sequelize](https://sequelize.org/) — ORM для работы с базами данных
-- [SQLite](https://www.sqlite.org/) — легковесная база данных
-- [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) — библиотека для работы с JWT
-- [argon2](https://github.com/ranisalt/node-argon2) — библиотека для хэширования паролей
-
-## Структура проекта
-
-```
-simpleAuth/
-├── index.js                # Точка входа в приложение
-├── src/
-│   ├── db/
-│   │   ├── db.js           # Настройка базы данных
-│   │   ├── User.js         # Модель пользователя
-│   ├── routes/
-│   │   ├── dev.js          # Маршруты для разработчиков
-│   │   ├── user.js         # Маршруты для пользователей
-│   ├── utils/
-│   │   ├── generateToken.js # Утилита для генерации токенов
-│   ├── swagger/
-│       ├── swaggerPaths.js # Swagger-документация
-├── .env                    # Конфигурация окружения
-├── package.json            # Зависимости и скрипты
-└── README.md               # Документация проекта
-```
-
-## Лицензия
-
-Этот проект распространяется под лицензией ISC.
+Если у вас есть вопросы или предложения, свяжитесь с нами по адресу: support@example.com.

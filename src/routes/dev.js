@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 
-router.post("/genAdminToken", (req, res) => {
+router.get("/genAdminToken", (req, res) => {
   try {
     const authorization = req.headers.authorization;
 
@@ -53,7 +53,7 @@ router.post("/genAdminToken", (req, res) => {
   }
 });
 
-router.post("/checkToken", async (req, res) => {
+router.get("/checkToken", async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
 

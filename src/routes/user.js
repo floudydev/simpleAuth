@@ -10,7 +10,7 @@ const router = express.Router();
 
 // Лимиты для маршрутов авторизации
 const authLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 минут
+  windowMs: 1 * 60 * 1000, // 5 минут
   max: 10, // максимум 10 запросов
   message: "Too many requests, please try again later.",
 });
@@ -34,7 +34,7 @@ router.use((req, res, next) => {
   next();
 });
 
-router.post(
+router.get(
   "/auth",
   authLimiter,
   [
@@ -142,12 +142,12 @@ router.post(
   }
 );
 
-router.post("/register", async (req, res) => {
+router.get("/register", async (req, res) => {
   const { name, mail, password } = req.query;
   if (!name || !mail || !password) {
     return res.status(400).json({
       error: "Missing parameters",
-      message: "name, email and password are required",
+      message: "name, mail and password are required",
     });
   }
 
@@ -174,7 +174,7 @@ router.post("/register", async (req, res) => {
   });
 });
 
-router.post("/generateJWT", async (req, res) => {
+router.get("/generateJWT", async (req, res) => {
   try {
     const { token, password, mail } = req.query;
     if (!token || !password || !mail) {
@@ -240,7 +240,7 @@ router.post("/generateJWT", async (req, res) => {
   }
 });
 
-router.post("/regenToken", async (req, res) => {
+router.get("/regenToken", async (req, res) => {
   const { password, mail } = req.query;
   if(!password || !mail) {
     return res.status(403).json({
