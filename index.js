@@ -58,8 +58,8 @@ app.use(cors(corsOptions));
 app.use(limiter);
 app.use(helmet());
 
-app.use("/dev/dev", devRoute);
-app.use("/prod/user", userRoute);
+app.use("/admin/dev", devRoute);
+app.use("/user", userRoute);
 
 const swaggerOptions = {
   swaggerDefinition: {
