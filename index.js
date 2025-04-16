@@ -79,7 +79,9 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.get("/", (req, res) => {
-  return res.sendStatus(200);
+  return res.sendStatus(200).json({
+    message: "SUCCESS"
+  })
 });
 
 app.listen(process.env.serverPort || 5000, () => {
