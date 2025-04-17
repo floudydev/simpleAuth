@@ -69,7 +69,7 @@ const swaggerOptions = {
       description: "API documentation for SimpleAuth",
     },
     servers: [
-      { url: "floudy-dev.su/api", description: "Local server" },
+      { url: "floudy-dev.su/api", description: "prod server" },
     ],
   },
   apis: ["src/swagger/swaggerPaths.js"], // Обновлено для использования swaggerPaths.js
